@@ -5,7 +5,8 @@
 
 
 from typing import NamedTuple, Sequence, Optional
-from primitive_interfaces.graph import GraphPrimitiveBase
+#from primitive_interfaces.graph import GraphTransformerPrimitiveBase
+from primitive_interfaces.graph import ClusteringPrimitiveBase
 from jhu_primitives.wrapper.read_graph_r import read_graph
 from jhu_primitives.wrapper.ig_wrapper_r import ig_get_adjacency_matrix
 from jhu_primitives.wrapper.ig_wrapper_r import ig_get_num_vertices
@@ -24,7 +25,7 @@ Output = None
 class Params(NamedTuple):
     adjacency_matrix: str # TODO: scipy.sparse.csc_matrix
 
-class JHUGraph(GraphPrimitiveBase[Input, Output, Params]):
+class JHUGraph(ClusteringPrimitiveBase[Input, Output, ]):
 
     adjacency_matrix = None
     _num_vertices = None
@@ -82,12 +83,6 @@ class JHUGraph(GraphPrimitiveBase[Input, Output, Params]):
         pass
 
     def fit(self, *, timeout: float = None, iterations: Optional[int] = 1) -> bool:
-        pass
-
-    def get_params(self) -> Params:
-        pass
-
-    def set_params(self, *, params: Params) -> None:
         pass
 
     def set_random_seed(self, *, seed: int) -> None:
