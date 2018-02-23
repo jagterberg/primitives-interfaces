@@ -33,21 +33,21 @@ setup(
     author_email="disa@jhu.edu",
     packages=[
               PACKAGE_NAME,
-              'jhu_primitives.monomial'
+              'jhu_primitives.ase'
     ],
     entry_points = {
         'd3m.primitives': [
             'jhu_primitives.AdjacencySpectralEmbedding=jhu_primitives.ase:AdjacencySpectralEmbedding',
-            'jhu_primitives.LaplacianSpectralEmbedding=jhu_primitives.lse:LaplacianSpectralEmbedding',
-            'jhu_primitives.DimensionSelection=jhu_primitives.dimselect:DimensionSelection',
-            'jhu_primitives.GaussianClustering=jhu_primitives.gclust:GaussianClustering',
-            'jhu_primitives.NonParametricClusteirng=jhu_primitives.nonpar:NonParametricClustering',
-            'jhu_primitives.NumberOfClusters=jhu_primitives.numclust:NumberOfClusters',
-            'jhu_primitives.OutOfCoreAdjacencySpectralEmbedding=jhu_primitives.oocase:OutOfCoreAdjacencySpectralEmbedding',
-            'jhu_primitives.PassToRanks=jhu_primitives.ptr:PassToRanks',
-            'jhu_primitives.SpectralGraphClustering=jhu_primitives.sgc:SpectralGraphClustering',
-            'jhu_primitives.SeededGraphMatching=jhu_primitives.sgm:SeededGraphMatching',
-            'jhu_primitives.VertexNominationSeededGraphMatching=jhu_primitives.vnsgm:VertexNominationSeededGraphMatching'
+#            'jhu_primitives.LaplacianSpectralEmbedding=jhu_primitives.lse:LaplacianSpectralEmbedding',
+#            'jhu_primitives.DimensionSelection=jhu_primitives.dimselect:DimensionSelection',
+#            'jhu_primitives.GaussianClustering=jhu_primitives.gclust:GaussianClustering',
+#            'jhu_primitives.NonParametricClusteirng=jhu_primitives.nonpar:NonParametricClustering',
+#            'jhu_primitives.NumberOfClusters=jhu_primitives.numclust:NumberOfClusters',
+#            'jhu_primitives.OutOfCoreAdjacencySpectralEmbedding=jhu_primitives.oocase:OutOfCoreAdjacencySpectralEmbedding',
+#            'jhu_primitives.PassToRanks=jhu_primitives.ptr:PassToRanks',
+#            'jhu_primitives.SpectralGraphClustering=jhu_primitives.sgc:SpectralGraphClustering',
+#            'jhu_primitives.SeededGraphMatching=jhu_primitives.sgm:SeededGraphMatching',
+#            'jhu_primitives.VertexNominationSeededGraphMatching=jhu_primitives.vnsgm:VertexNominationSeededGraphMatching'
             ]
     },
     package_data = {'': ['*.r', '*.R']},
@@ -61,18 +61,18 @@ setup(
     packages=[
               PACKAGE_NAME,
               'jhu_primitives.ase',
-              'jhu_primitives.lse',
-              'jhu_primitives.dimselect',
-              'jhu_primitives.gclust',
-              'jhu_primitives.nonpar',
-              'jhu_primitives.numclust',
-              'jhu_primitives.oocase',
-              'jhu_primitives.ptr',
-              'jhu_primitives.sgc',
-              'jhu_primitives.sgm',
-              'jhu_primitives.vnsgm',
-              'jhu_primitives.utils',
-              'jhu_primitives.wrapper',
-              'jhu_primitives.core',
-              'jhu_primitives.monomial'
+              # 'jhu_primitives.lse',
+              # 'jhu_primitives.dimselect',
+              # 'jhu_primitives.gclust',
+              # 'jhu_primitives.nonpar',
+              # 'jhu_primitives.numclust',
+              # 'jhu_primitives.oocase',
+              # 'jhu_primitives.ptr',
+              # 'jhu_primitives.sgc',
+              # 'jhu_primitives.sgm',
+              # 'jhu_primitives.vnsgm',
+              # 'jhu_primitives.utils',
+              # 'jhu_primitives.wrapper',
+              # 'jhu_primitives.core',
+              # 'jhu_primitives.monomial'
     ]"""
