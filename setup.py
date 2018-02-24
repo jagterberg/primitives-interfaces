@@ -54,7 +54,7 @@ setup(
     include_package_data = True,
     install_requires=['typing', 'numpy', 'scipy',
         'python-igraph', 'rpy2', 'sklearn', 'jinja2', 'primitive_interfaces'],
-    url='https://github.com/neurodata/primitives-interfaces',
+    url='https://github.com/youngser/D3M/primitives-interfaces',
 )
 
 """

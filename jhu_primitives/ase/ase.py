@@ -45,8 +45,9 @@ class AdjacencySpectralEmbedding(TransformerPrimitiveBase[Inputs, Outputs, Hyper
             'name': "JHU",
             'uris': [
                 # Unstructured URIs. Link to file and link to repo in this case.
-                'https://github.com/neurodata/primitives-interfaces/blob/jp-devM1/jhu_primitives/ase/ase.py',
-                'https://github.com/neurodata/primitives-interfaces.git',
+                'https://github.com/youngser/D3M/primitives-interfaces/jhu_primitives/ase/ase.py',
+#                'https://github.com/youngser/primitives-interfaces/blob/jp-devM1/jhu_primitives/ase/ase.py',
+                'https://github.com/youngser/D3M/primitives-interfaces.git',
             ],
         },
         # A list of dependencies in order. These can be Python packages, system packages, or Docker images.
@@ -55,7 +56,7 @@ class AdjacencySpectralEmbedding(TransformerPrimitiveBase[Inputs, Outputs, Hyper
         # a dependency which is not on PyPi.
         'installation': [{
             'type': metadata_module.PrimitiveInstallationType.PIP,
-            'package_uri': 'git+https://github.com/neurodata/primitives-interfaces/tree/yp-dev.git@{git_commit}#egg=jhu.ase'.format(
+            'package_uri': 'git+https://github.com/youngser/D3M/primitives-interfaces.git@{git_commit}#egg=jhu.ase'.format(
                 git_commit=utils.current_git_commit(os.path.dirname(__file__)),
                 ),
         }],
