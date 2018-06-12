@@ -1,22 +1,15 @@
-#!/usr/bin/env python
-
-# dimselect.py
-# Copyright (c) 2017. All rights reserved.
-
-
-
 from rpy2 import robjects
 from typing import Sequence, TypeVar, Union, Dict
 import os
-
 from d3m.primitive_interfaces.transformer import TransformerPrimitiveBase
-#from jhu_primitives.core.JHUGraph import JHUGraph
-import numpy as np
+import numpy
 from d3m import container
 from d3m import utils
 from d3m.metadata import hyperparams, base as metadata_module, params
 from d3m.primitive_interfaces import base
 from d3m.primitive_interfaces.base import CallResult
+import igraph
+import networkx
 
 
 Inputs = container.ndarray
@@ -26,8 +19,8 @@ class Params(params.Params):
     pass
 
 class Hyperparams(hyperparams.Hyperparams):
-    #hp = hyperparams.Hyperparameter[None](default = None,semantic_types=['https://metadata.datadrivendiscovery.org/types/MetafeatureParameter'])
-    n_elbows = hyperparams.Hyperparameter[int](default=3, semantic_types=['https://metadata.datadrivendiscovery.org/types/ControlParameter'])
+    #dim = hyperparams.Hyperparameter[None](default=None)
+    dim = None
 
 def file_path_conversion(abs_file_path, uri="file"):
     local_drive, file_path = abs_file_path.split(':')[0], abs_file_path.split(':')[1]
@@ -55,24 +48,24 @@ def file_path_conversion(abs_file_path, uri="file"):
     else:
         return local_drive + ":" + s
 
-class DimensionSelection(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
+class LargestConnectedComponent(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
     # This should contain only metadata which cannot be automatically determined from the code.
     metadata = metadata_module.PrimitiveMetadata({
         # Simply an UUID generated once and fixed forever. Generated using "uuid.uuid4()".
-        'id': '7b8ff08a-f887-3be5-86c8-9f0123bd4936',
-        'version': "0.3.0",
-        'name': "jhu.dimselect",
+        'id': '32fec24f-6861-4a4c-88f3-d4ec2bc1b486',
+        'version': "0.1.0",
+        'name': "jhu.lcc",
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.jhu_primitives.DimensionSelection',
+        'python_path': 'd3m.primitives.jhu_primitives.LargestConnectedComponent',
         # Keywords do not have a controlled vocabulary. Authors can put here whatever they find suitable.
-        'keywords': ['dimselect primitive'],
+        'keywords': ['spectral clustering'],
         'source': {
             'name': "JHU",
             'uris': [
                 # Unstructured URIs. Link to file and link to repo in this case.
-                'https://github.com/neurodata/primitives-interfaces/jhu_primitives/dimselect/dimselect.py',
+                'https://github.com/neurodata/primitives-interfaces/jhu_primitives/lcc/lcc.py',
 #                'https://github.com/youngser/primitives-interfaces/blob/jp-devM1/jhu_primitives/ase/ase.py',
-                'https://github.com//neurodata/primitives-interfaces.git',
+                'https://github.com/neurodata/primitives-interfaces.git',
             ],
         },
         # A list of dependencies in order. These can be Python packages, system packages, or Docker images.
@@ -108,9 +101,19 @@ class DimensionSelection(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams])
             {
             'type': 'PIP',
             'package_uri': 'git+https://github.com/neurodata/primitives-interfaces.git@{git_commit}#egg=jhu_primitives'.format(
-                git_commit=utils.current_git_commit(os.path.dirname(__file__)),
-            ),
-        }],
+                git_commit=utils.current_git_commit(os.path.dirname(__file__)),),
+            },
+            {
+            'type': 'PIP',
+            'package': 'python_igraph',
+            'version': '0.7.1'
+            },
+            {
+            'type': 'PIP',
+            'package': 'networkx',
+            'version': '2.1'
+            }
+            ],
         # URIs at which one can obtain code for the primitive, if available.
         # 'location_uris': [
         #     'https://gitlab.com/datadrivendiscovery/tests-data/raw/{git_commit}/primitives/test_primitives/monomial.py'.format(
@@ -120,9 +123,9 @@ class DimensionSelection(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams])
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [
-            "BAYESIAN_OPTIMIZATION"
+            "GAUSSIAN_PROCESS"
         ],
-        'primitive_family': "FEATURE_EXTRACTION"
+        'primitive_family': "GRAPH_CLUSTERING"
     })
 
     def __init__(self, *, hyperparams: Hyperparams, random_seed: int = 0, docker_containers: Dict[str, base.DockerContainer] = None) -> None:
@@ -130,29 +133,37 @@ class DimensionSelection(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams])
 
     def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
         """
-        Select the right number of dimensions within which to embed given
-        an adjacency matrix
+        Input: g: an n x n matrix, n x 2 edge list, a networkx Graph, or igraph Graph 
+        Output: The largest connected component of g
 
-        **Positional Arguments:**
-
-        X:
-            - Adjacency matrix
         """
-        
-        path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                "dimselect.interface.R")
-        path = file_path_conversion(path, uri="")
-        n_elbows = self.hyperparams['n_elbows']
-        cmd = """
-        source("%s")
-        fn <- function(X, n_elbows) {
-            dimselect.interface(X, n_elbows)
-        }
-        """ % path
 
-        #print(cmd)
+        g = inputs
 
-        result = np.array(robjects.r(cmd)(inputs, n_elbows))
+        if type(g) == list:
+            g = igraph.Graph(g)
+
+        if type(g) == numpy.ndarray:
+            if g.shape[0] == g.shape[1]: # n x n matrix
+                g = networkx.Graph(g) # convert to networkx graph to be able to extract edge list 
+            elif g.shape[1] == 2: # n x 2 matrix
+                g = igraph.Graph(list(g))
+            else:
+                print("Neither n x n nor n x 2. Please submit a square matrix or edge list.")
+                return
+                
+        if type(g) == networkx.classes.graph.Graph: # networkx graph
+            g = igraph.Graph(list(g.edges)) # convert to igraph graph, find the clusters
+            
+        if type(g) == igraph.Graph: # igraph graph
+            components = g.clusters()
+            components_len = [len(components[i]) for i in range(len(components))] # find lengths of components (faster way?)
+            largest_component = components[numpy.argmax(components_len)]
+        else:
+            print("Unsupported graph type")
+            return
+
+        result = numpy.array(largest_component)
 
         outputs = container.ndarray(result)
 
